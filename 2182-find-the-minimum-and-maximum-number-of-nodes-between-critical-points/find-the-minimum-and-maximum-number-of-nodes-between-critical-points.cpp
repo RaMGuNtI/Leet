@@ -1,44 +1,39 @@
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
 class Solution {
 public:
     vector<int> nodesBetweenCriticalPoints(ListNode* head) {
-        ListNode* left=nullptr;
-        ListNode* right;
+        ListNode* prev = head;
+        ListNode* curr = head->next;
 
-        ListNode* temp = head;
-        vector<int> critical;
-        int count = 0;
-        while(temp){
-            if(left && temp->next){
-                if(left->val<temp->val && temp->val>temp->next->val){
-                    critical.push_back(count);
+        int index = 1;
+        int first = -1;
+        int last = -1;
+        int minDist = INT_MAX;
+
+        while (curr->next) {
+            bool isCritical =
+                (curr->val > prev->val && curr->val > curr->next->val) ||
+                (curr->val < prev->val && curr->val < curr->next->val);
+
+            if (isCritical) {
+                if (first == -1) {
+                    first = index;
+                } else {
+                    minDist = min(minDist, index - last);
                 }
-                if(left->val>temp->val && temp->val<temp->next->val){
-                    critical.push_back(count);
-                }
+
+                last = index;
             }
-            left = temp;
-            temp = temp->next;
-            count++;
+
+            prev = curr;
+            curr = curr->next;
+            index++;
         }
-        if(critical.size()<2) return {-1, -1};
-        int criSize = critical.size();
-        int ma = critical[criSize-1]-critical[0];
 
-        int mi = INT_MAX;
-        for(int i=0; i<criSize-1; i++){
-            mi = min(mi, critical[i+1] - critical[i]);
-        }                
+        if (first == -1 || first == last)
+            return {-1, -1};
 
-        return {mi, ma};
+        int maxDist = last - first;
+
+        return {minDist, maxDist};
     }
 };
