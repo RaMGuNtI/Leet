@@ -2,30 +2,20 @@ class Solution {
 public:
     int firstStableIndex(vector<int>& nums, int k) {
         int n = nums.size();
-        if(n<2) return 0;
-        vector<int> mge(n, -1);
-        vector<int> sge(n, -1);
+        int prefixMax = nums[0];
 
-        int maxi = INT_MIN;
-        for(int i=0; i<n; i++){
-            if(maxi==INT_MIN){
-                maxi = nums[i];
-            }
-            maxi = max(nums[i], maxi);
-            mge[i] = maxi;
+        vector<int> suffix(n);
+        
+        suffix[n - 1] = nums[n - 1];
+        for (int j = n - 2; j >= 0; j--) {
+            suffix[j] = min(nums[j], suffix[j + 1]);
         }
 
-        int mini = INT_MAX;
-        for(int i=n-1; i>=0; i--){
-            if(mini==INT_MAX){
-                mini = nums[i];
-            }
-            mini = min(nums[i], mini);
-            sge[i] = mini;
-        }
+        for (int j = 0; j < n; j++) {
+            prefixMax = max(prefixMax, nums[j]);
 
-        for(int i=0; i<n; i++){
-            if(mge[i]-sge[i]<=k) return i;
+            if (prefixMax - suffix[j] <= k)
+                return j;
         }
 
         return -1;
