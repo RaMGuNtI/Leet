@@ -4,10 +4,14 @@ public:
         const int n = nums.size();
 
         vector<int> pre(n), suff(n);
+        unordered_map<int, int> mp;
 
         pre[0] = nums[0];
+        mp[pre[0]] = 0;
+
         for(int i = 1; i < n; i++){
             pre[i] = pre[i - 1] + nums[i];
+            mp[pre[i]] = i;
         }
 
         suff[n - 1] = nums[n - 1];
@@ -24,10 +28,9 @@ public:
 
         for (int i = n - 1; i >= 0; i--){
             int diff = x - suff[i];
-            auto lb = lower_bound(pre.begin(), pre.end(), diff) - pre.begin();
 
-            if (lb < n and pre[lb] == diff and lb < i){
-                mini = min(mini, (n - i) + (int)(lb + 1));
+            if (mp.count(diff) and mp[diff] + 1 < i) {
+                mini = min(mini, (n - i) + mp[diff] + 1);
             }
         }
 
